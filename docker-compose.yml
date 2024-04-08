@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  database:
+    image: mariadb:10.6.4-focal
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+      MYSQL_DATABASE: '${MYSQL_DATABASE}'
+      MYSQL_USER: '${MYSQL_USER}'
+      MYSQL_PASSWORD: '${MYSQL_PASSWORD}'
+
+  phpmyadmin:
+    depends_on:
+      - database
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    ports:
+      - 8081:80
+    env_file: .env
+    environment:
+      PMA_HOST: database
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+  drupal:
+    depends_on:
+      - database
+    image: drupal
+    restart: unless-stopped
+    ports:
+      - 8080:80
+    env_file: .env
+    environment:
+      DRUPAL_DB_HOST: database:3306 
+      DRUPAL_DB_NAME: '${MYSQL_DATABASE}'
+      DRUPAL_DB_USER: '${MYSQL_USER}'
+      DRUPAL_DB_PASSWORD: '${MYSQL_PASSWORD}'
+
